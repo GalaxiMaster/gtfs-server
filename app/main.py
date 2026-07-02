@@ -30,9 +30,9 @@ async def get_gtfs():
         raise HTTPException(404)
     return FileResponse(path, media_type="application/gzip")
 
-@app.get("/gtfs_version.json")
+@app.get("/version")
 async def get_version():
-    path = DATA_DIR / "gtfs_version.json"
+    path = DATA_DIR / ".gtfs_state.json"
     if not path.exists():
         raise HTTPException(404)
     return FileResponse(path, media_type="application/json")

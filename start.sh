@@ -21,4 +21,4 @@ fi
 
 cd /app
 echo "Starting uvicorn..."
-exec uvicorn main:app --host 0.0.0.0 --port 8000p
+exec uvicorn main:app --host 0.0.0.0 --port 8000
