@@ -8,8 +8,8 @@ pip install --no-cache-dir \
   httpx \
   aiosqlite \
   firebase-admin \
-  gtfs-realtime-bindings
-
+  gtfs-realtime-bindings \
+  pydantic
 echo "Checking required files..."
 
 # if [ ! -f /app/app/data/gtfs.db.gz ]; then

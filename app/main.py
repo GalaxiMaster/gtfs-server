@@ -1,3 +1,4 @@
+from models import SubscriptionRequest
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 import aiosqlite
@@ -6,8 +7,8 @@ from poller import start_polling
 from pathlib import Path
 
 app = FastAPI()
-DB_PATH = "subscriptions.db"
 DATA_DIR = Path(__file__).parent / "data"
+DB_PATH = DATA_DIR / "subscriptions.db"
 
 @app.on_event("startup")
 async def startup():
@@ -38,11 +39,11 @@ async def get_version():
     return FileResponse(path, media_type="application/json")
 
 @app.post("/subscribe")
-async def subscribe(trip_id: str, stop_id: str, fcm_token: str):
+async def subscribe(payload: SubscriptionRequest):
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute(
             "INSERT OR REPLACE INTO subscriptions VALUES (?, ?, ?)",
-            (trip_id, fcm_token, stop_id),
+            (payload.trip_id, payload.fcm_token, payload.stop_id),
         )
         await db.commit()
     return {"status": "subscribed"}
