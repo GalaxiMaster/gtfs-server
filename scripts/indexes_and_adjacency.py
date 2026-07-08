@@ -52,15 +52,45 @@ def build_adjacencies(path: str = 'assets/'):
             WHERE stops.stop_id = stop_times.stop_id
         )
     ''')
+    
+    cur.execute('''
+        ALTER TABLE stop_times ADD COLUMN departure_secs INTEGER;
+    ''')
+    cur.execute('''
+        ALTER TABLE stop_times ADD COLUMN arrival_secs INTEGER;
+    ''')
+
+    cur.execute('''
+        UPDATE stop_times SET
+        departure_secs = CAST(substr(departure_time,1,2) AS INTEGER)*3600
+                        + CAST(substr(departure_time,4,2) AS INTEGER)*60
+                        + CAST(substr(departure_time,7,2) AS INTEGER),
+        arrival_secs = CAST(substr(arrival_time,1,2) AS INTEGER)*3600
+                        + CAST(substr(arrival_time,4,2) AS INTEGER)*60
+                        + CAST(substr(arrival_time,7,2) AS INTEGER);
+    ''')
+    cur.execute('''
+        ALTER TABLE stop_times DROP COLUMN departure_time;
+    ''')
+    cur.execute('''
+        ALTER TABLE stop_times DROP COLUMN arrival_time;
+    ''')
+    cur.execute('''
+        ALTER TABLE stop_times DROP COLUMN shape_dist_traveled;
+    ''')
 
     # Add indexes to speed up queries
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_st_parent     ON stop_times(parent_station)')
     cur.execute('CREATE INDEX IF NOT EXISTS idx_st_trip_seq   ON stop_times(trip_id, stop_sequence)')
     cur.execute('CREATE INDEX IF NOT EXISTS idx_trips_service ON trips(service_id)')
     cur.execute('CREATE INDEX IF NOT EXISTS idx_cal_service   ON calendar(service_id)')
-    cur.execute('CREATE INDEX IF NOT EXISTS idx_st_parent_covering ON stop_times(parent_station, trip_id, departure_time, arrival_time)')
-
+    cur.execute('CREATE INDEX IF NOT EXISTS idx_st_parent_covering ON stop_times(parent_station, trip_id, departure_secs, arrival_secs)')
+    cur.execute('CREATE INDEX IF NOT EXISTS idx_trips_trip_id ON trips(trip_id);')
+    
     con.commit()
+    
+    con.isolation_level = None
+    cur.execute('VACUUM')
+    
     con.close()
     print("Done!")
 if __name__ == "__main__":

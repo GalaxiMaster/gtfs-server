@@ -117,9 +117,9 @@ def fetch_gtfs():
     csv_to_db(path=OUTPUT_DIR)
     add_type_column(path=OUTPUT_DIR)
     merge_dbs(path=OUTPUT_DIR)
-    verify_and_fts(path=OUTPUT_DIR)
     build_adjacencies(path=OUTPUT_DIR)
-    
+    verify_and_fts(path=OUTPUT_DIR)
+
     SOURCE = BASE_DIR / 'scripts' / 'data' / 'gtfs.db'
     DEST = BASE_DIR / 'app' / 'data'
     print(DEST)

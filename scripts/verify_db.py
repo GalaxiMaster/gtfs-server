@@ -17,5 +17,7 @@ def verify_and_fts(path:str = 'assets/'):
     print(f"FTS rows indexed: {cur.fetchone()[0]:,}")
     cur.execute("SELECT stop_name FROM stops_fts WHERE stops_fts MATCH 'Central*' LIMIT 5")
     print(f"Test search: {[r[0] for r in cur.fetchall()]}")
+    cur.execute("SELECT * FROM calendar LIMIT 5")
+    print(f"Test search: {[r for r in cur.fetchall()]}")
 
     con.close()
